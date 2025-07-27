@@ -138,6 +138,30 @@
   input:checked + .slider:before {
     transform: translateX(24px);
   }
+
+  #play-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  #play-icon {
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+  }
+  #console-log {
+    display: none;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.6);
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
 </style>
 </head>
 <body>
@@ -157,6 +181,7 @@
     <section id="func-panel" aria-live="polite" aria-label="Painel de configuração">
       <h2 id="func-title">Configuração</h2>
       <p id="func-desc">Descrição da função selecionada aparecerá aqui.</p>
+
       <div class="switch-group">
         <label class="switch-label" for="save-config-switch">
           Salvar Configuração
@@ -173,80 +198,106 @@
           </label>
         </label>
       </div>
+
+      <div id="play-container">
+        <img id="play-icon" src="https://cdn.pixabay.com/animation/2023/01/19/18/24/18-24-20-426_512.gif" alt="Play" />
+      </div>
+
+      <div id="console-log" aria-live="polite"></div>
     </section>
   </main>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const buttons = document.querySelectorAll('#menu button');
-      const funcPanel = document.getElementById('func-panel');
-      const funcTitle = document.getElementById('func-title');
-      const funcDesc = document.getElementById('func-desc');
-      const saveSwitch = document.getElementById('save-config-switch');
-      const enableSwitch = document.getElementById('enable-module-switch');
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const buttons = document.querySelectorAll('#menu button');
+  const funcPanel = document.getElementById('func-panel');
+  const funcTitle = document.getElementById('func-title');
+  const funcDesc = document.getElementById('func-desc');
+  const saveSwitch = document.getElementById('save-config-switch');
+  const enableSwitch = document.getElementById('enable-module-switch');
+  const playIcon = document.getElementById('play-icon');
+  const consoleLog = document.getElementById('console-log');
 
-      const LS_SAVE_PREFIX = 'saveConfig_';
-      const LS_ENABLE_PREFIX = 'enableModule_';
+  const LS_SAVE_PREFIX = 'saveConfig_';
+  const LS_ENABLE_PREFIX = 'enableModule_';
 
-      const descriptions = {
-        construcao: "Automatiza a construção e melhoria de edifícios.",
-        farm: "Gerencia ataques automáticos para coletar recursos.",
-        recrutamento: "Controla o recrutamento automático de tropas."
-      };
+  const descriptions = {
+    construcao: "Automatiza a construção e melhoria de edifícios.",
+    farm: "Gerencia ataques automáticos para coletar recursos.",
+    recrutamento: "Controla o recrutamento automático de tropas."
+  };
 
-      let currentFunc = null;
+  let currentFunc = null;
 
-      function updatePanel(func) {
-        currentFunc = func;
-        funcTitle.textContent = buttonsNamed[func].title || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
-        funcDesc.textContent = descriptions[func] || '';
+  // Botões indexados por nome da função
+  const buttonsNamed = {};
+  buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
 
-        saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
-        enableSwitch.checked = localStorage.getItem(LS_ENABLE_PREFIX + func) === 'true';
+  function updatePanel(func) {
+    currentFunc = func;
+    funcTitle.textContent = buttonsNamed[func].title || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
+    funcDesc.textContent = descriptions[func] || '';
 
-        funcPanel.style.display = 'flex';
+    saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
+    enableSwitch.checked = localStorage.getItem(LS_ENABLE_PREFIX + func) === 'true';
 
-        buttons.forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.func === func);
-          btn.setAttribute('aria-pressed', btn.dataset.func === func);
-        });
+    funcPanel.style.display = 'flex';
 
-        funcPanel.focus();
-      }
-
-      // Criar um objeto para facilitar acesso ao botão pelo nome
-      const buttonsNamed = {};
-      buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
-
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => updatePanel(btn.dataset.func));
-      });
-
-      saveSwitch.addEventListener('change', () => {
-        if (!currentFunc) return;
-        localStorage.setItem(LS_SAVE_PREFIX + currentFunc, saveSwitch.checked);
-      });
-
-      enableSwitch.addEventListener('change', () => {
-        if (!currentFunc) return;
-        localStorage.setItem(LS_ENABLE_PREFIX + currentFunc, enableSwitch.checked);
-      });
-
-      document.body.addEventListener('click', e => {
-        if (
-          funcPanel.style.display === 'flex' &&
-          !funcPanel.contains(e.target) &&
-          !e.target.closest('#menu')
-        ) {
-          funcPanel.style.display = 'none';
-          currentFunc = null;
-          buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-pressed', 'false');
-          });
-        }
-      });
+    buttons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.func === func);
+      btn.setAttribute('aria-pressed', btn.dataset.func === func);
     });
-  </script>
+
+    funcPanel.focus();
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => updatePanel(btn.dataset.func));
+  });
+
+  saveSwitch.addEventListener('change', () => {
+    if (!currentFunc) return;
+    localStorage.setItem(LS_SAVE_PREFIX + currentFunc, saveSwitch.checked);
+  });
+
+  enableSwitch.addEventListener('change', () => {
+    if (!currentFunc) return;
+    localStorage.setItem(LS_ENABLE_PREFIX + currentFunc, enableSwitch.checked);
+  });
+
+  document.body.addEventListener('click', e => {
+    if (
+      funcPanel.style.display === 'flex' &&
+      !funcPanel.contains(e.target) &&
+      !e.target.closest('#menu')
+    ) {
+      funcPanel.style.display = 'none';
+      currentFunc = null;
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+    }
+  });
+
+  function logConsole(msg) {
+    const ts = new Date().toLocaleTimeString();
+    const div = document.createElement('div');
+    div.textContent = `[${ts}] ${msg}`;
+    consoleLog.appendChild(div);
+    consoleLog.scrollTop = consoleLog.scrollHeight;
+  }
+
+  playIcon.addEventListener('click', () => {
+    consoleLog.style.display = 'block';
+    logConsole('▶️ Execução iniciada');
+
+    // Exemplo de log simulando processo:
+    setTimeout(() => logConsole('Verificando configurações salvas do módulo...'), 1000);
+    setTimeout(() => logConsole('Módulo carregado com sucesso.'), 2000);
+    setTimeout(() => logConsole('Aguardando ações automáticas...'), 3000);
+  });
+});
+</script>
 </body>
 </html>

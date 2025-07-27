@@ -75,7 +75,7 @@
     align-items: center;
   }
   #func-panel {
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.9); /* aumentado para melhor contraste */
     border-radius: 12px;
     padding: 30px 40px 20px 40px;
     box-shadow: 0 0 20px #000;
@@ -243,7 +243,7 @@
         consoleEl.scrollTop = consoleEl.scrollHeight;
       }
 
-      function updatePanel(func) {
+      function updatePanel(func, logMessages = true) {
         currentFunc = func;
         const btn = buttonsNamed[func];
         funcTitle.textContent = btn?.querySelector('img')?.alt || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
@@ -259,9 +259,11 @@
           btn.setAttribute('aria-pressed', btn.dataset.func === func ? 'true' : 'false');
         });
 
-        log(`Painel aberto: ${funcTitle.textContent}`);
-        log(`Salvar Configuração: ${saveSwitch.checked}`);
-        log(`Habilitar Módulo: ${enableSwitch.checked}`);
+        if (logMessages) {
+          log(`Painel aberto: ${funcTitle.textContent}`);
+          log(`Salvar Configuração: ${saveSwitch.checked}`);
+          log(`Habilitar Módulo: ${enableSwitch.checked}`);
+        }
 
         funcPanel.focus();
       }
@@ -290,6 +292,11 @@
         ) {
           funcPanel.style.display = 'none';
           log(`Painel fechado`);
+          if(currentFunc && buttonsNamed[currentFunc]) {
+            buttonsNamed[currentFunc].focus();
+          } else {
+            buttons[0].focus();
+          }
           currentFunc = null;
           buttons.forEach(btn => {
             btn.classList.remove('active');
@@ -298,8 +305,8 @@
         }
       });
 
-      // Abre automaticamente o painel da primeira função
-      updatePanel('construcao');
+      // Abre automaticamente o painel da primeira função, sem logs
+      updatePanel('construcao', false);
     });
   </script>
 </body>

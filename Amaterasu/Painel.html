@@ -1,252 +1,184 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Assistente - Painel</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
-<style>
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%;
-    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center center fixed;
-    background-size: cover !important;
-    background-color: rgba(0,0,0,0.5);
-    background-blend-mode: darken;
-    font-family: 'Montserrat', sans-serif;
-    color: #eee;
-    display: flex;
-    overflow: hidden;
-  }
-  #menu {
-    width: 80px;
-    background-color: rgba(0,0,0,0.6);
-    border-radius: 20px;
-    margin: 30px 0;
-    padding: 10px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-self: center;
-    min-height: 100px;
-    align-items: center;
-  }
-  #menu button {
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    transition: background-color 0.2s ease;
-  }
-  #menu button:hover,
-  #menu button.active {
-    background-color: rgba(255,255,255,0.2);
-  }
-  #menu button img {
-    width: 32px;
-    height: 32px;
-    pointer-events: none;
-    user-select: none;
-  }
-  #content {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  #func-panel {
-    background: rgba(0,0,0,0.8);
-    border-radius: 12px;
-    padding: 30px 40px 40px 40px;
-    box-shadow: 0 0 20px #000;
-    color: #eee;
-    max-width: 600px;
-    width: 100%;
-    display: none;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-  }
-  #func-title {
-    margin: 0 0 10px 0;
-    font-weight: 600;
-    font-size: 1.6rem;
-    text-align: center;
-  }
-  #func-desc {
-    font-size: 1rem;
-    color: #ccc;
-    margin: 0 0 30px 0;
-    text-align: center;
-  }
-  .switch-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    font-size: 1rem;
-    align-items: center;
-    width: 100%;
-  }
-  .switch-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    user-select: none;
-    width: 240px;
-  }
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-  }
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccc;
-    transition: 0.4s;
-    border-radius: 34px;
-  }
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.4s;
-    border-radius: 50%;
-  }
-  input:checked + .slider {
-    background-color: #4caf50;
-  }
-  input:checked + .slider:before {
-    transform: translateX(24px);
-  }
-</style>
-</head>
-<body>
-  <nav id="menu" role="navigation" aria-label="Menu de funções">
-    <button type="button" data-func="construcao" title="Construção Automática" aria-pressed="false">
-      <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construção Automática">
-    </button>
-    <button type="button" data-func="farm" title="Farm Automático" aria-pressed="false">
-      <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Farm Automático">
-    </button>
-    <button type="button" data-func="recrutamento" title="Recrutamento Automático" aria-pressed="false">
-      <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutamento Automático">
-    </button>
-  </nav>
+// ==UserScript==
+// @name         Amaterasu
+// @namespace    https://tribalwars.com.br/
+// @version      1.1
+// @description  Cria botão que abre o painel modal com transição e salva estado.
+// @author       Triky, GPT & Cia
+// @include      http*://*.tribalwars.*/game.php?*&screen=storage*
+// @grant        none
+// ==/UserScript==
 
-  <main id="content" tabindex="-1">
-    <section id="func-panel" aria-live="polite" aria-label="Painel de configuração">
-      <h2 id="func-title">Configuração</h2>
-      <p id="func-desc">Descrição da função selecionada aparecerá aqui.</p>
-      <div class="switch-group">
-        <label class="switch-label" for="save-config-switch">
-          Salvar Configuração
-          <label class="switch">
-            <input type="checkbox" id="save-config-switch" />
-            <span class="slider"></span>
-          </label>
-        </label>
-        <label class="switch-label" for="enable-module-switch">
-          Habilitar Módulo
-          <label class="switch">
-            <input type="checkbox" id="enable-module-switch" />
-            <span class="slider"></span>
-          </label>
-        </label>
-      </div>
-    </section>
-  </main>
+(function () {
+  'use strict';
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const buttons = document.querySelectorAll('#menu button');
-      const funcPanel = document.getElementById('func-panel');
-      const funcTitle = document.getElementById('func-title');
-      const funcDesc = document.getElementById('func-desc');
-      const saveSwitch = document.getElementById('save-config-switch');
-      const enableSwitch = document.getElementById('enable-module-switch');
+  const gifURL = "https://cdn.pixabay.com/animation/2023/01/19/18/24/18-24-20-426_512.gif";
+  const painelURL = "https://play2market.github.io/Painel.html"; // CORRIGIDO AQUI (P maiúsculo)
+  const STORAGE_KEY = 'amaterasu_modal_aberto';
 
-      const LS_SAVE_PREFIX = 'saveConfig_';
-      const LS_ENABLE_PREFIX = 'enableModule_';
+  function createButton() {
+    if (document.getElementById('custom_chama_btn')) return;
 
-      const descriptions = {
-        construcao: "Automatiza a construção e melhoria de edifícios.",
-        farm: "Gerencia ataques automáticos para coletar recursos.",
-        recrutamento: "Controla o recrutamento automático de tropas."
-      };
+    const newQuest = document.querySelector('#new_quest');
+    if (!newQuest) return;
 
-      let currentFunc = null;
+    const btn = document.createElement('img');
+    btn.id = 'custom_chama_btn';
+    btn.src = gifURL;
+    btn.title = "Abrir painel";
 
-      function updatePanel(func) {
-        currentFunc = func;
-        funcTitle.textContent = buttonsNamed[func].title || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
-        funcDesc.textContent = descriptions[func] || '';
-
-        saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
-        enableSwitch.checked = localStorage.getItem(LS_ENABLE_PREFIX + func) === 'true';
-
-        funcPanel.style.display = 'flex';
-
-        buttons.forEach(btn => {
-          btn.classList.toggle('active', btn.dataset.func === func);
-          btn.setAttribute('aria-pressed', btn.dataset.func === func);
-        });
-
-        funcPanel.focus();
-      }
-
-      // Criar um objeto para facilitar acesso ao botão pelo nome
-      const buttonsNamed = {};
-      buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
-
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => updatePanel(btn.dataset.func));
-      });
-
-      saveSwitch.addEventListener('change', () => {
-        if (!currentFunc) return;
-        localStorage.setItem(LS_SAVE_PREFIX + currentFunc, saveSwitch.checked);
-      });
-
-      enableSwitch.addEventListener('change', () => {
-        if (!currentFunc) return;
-        localStorage.setItem(LS_ENABLE_PREFIX + currentFunc, enableSwitch.checked);
-      });
-
-      document.body.addEventListener('click', e => {
-        if (
-          funcPanel.style.display === 'flex' &&
-          !funcPanel.contains(e.target) &&
-          !e.target.closest('#menu')
-        ) {
-          funcPanel.style.display = 'none';
-          currentFunc = null;
-          buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.setAttribute('aria-pressed', 'false');
-          });
-        }
-      });
+    Object.assign(btn.style, {
+      width: "80px",
+      height: "80px",
+      position: "absolute",
+      cursor: "pointer",
+      zIndex: "999999"
     });
-  </script>
-</body>
-</html>
+
+    document.body.appendChild(btn);
+
+    const updatePosition = () => {
+      const rect = newQuest.getBoundingClientRect();
+      const x = rect.left + window.scrollX + (rect.width / 2) - (btn.offsetWidth / 2);
+      const y = rect.bottom + 5 + window.scrollY;
+      btn.style.left = `${x}px`;
+      btn.style.top = `${y}px`;
+    };
+
+    updatePosition();
+    window.addEventListener('scroll', updatePosition);
+    window.addEventListener('resize', updatePosition);
+
+    btn.addEventListener('click', () => toggleModal());
+  }
+
+  function createModal() {
+    if (document.getElementById('custom_modal')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'custom_modal';
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: 0, left: 0,
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      display: 'none',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 999998,
+      opacity: 0,
+      transition: 'opacity 0.3s ease',
+      flexDirection: 'column',
+    });
+
+    const container = document.createElement('div');
+    Object.assign(container.style, {
+      position: 'relative',
+      width: '95vw',
+      maxWidth: '1100px',
+      height: '90vh',
+      maxHeight: '650px',
+      borderRadius: '8px',
+      backgroundColor: 'transparent',
+      boxShadow: '0 0 15px rgba(0,0,0,0.5)',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+    });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    Object.assign(closeBtn.style, {
+      position: 'absolute',
+      top: '8px',
+      right: '8px',
+      width: '30px',
+      height: '30px',
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      border: 'none',
+      borderRadius: '15px',
+      color: '#eee',
+      fontSize: '20px',
+      cursor: 'pointer',
+      zIndex: 1000000,
+      lineHeight: '30px',
+      textAlign: 'center',
+      padding: 0,
+      userSelect: 'none',
+      transition: 'background-color 0.3s ease',
+    });
+    closeBtn.addEventListener('mouseenter', () => {
+      closeBtn.style.backgroundColor = 'rgba(0,0,0,0.8)';
+    });
+    closeBtn.addEventListener('mouseleave', () => {
+      closeBtn.style.backgroundColor = 'rgba(0,0,0,0.6)';
+    });
+    closeBtn.addEventListener('click', () => toggleModal(false));
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'custom_iframe';
+    iframe.title = 'Painel do Assistente';
+    Object.assign(iframe.style, {
+      width: '100%',
+      height: '100%',
+      border: 'none',
+      borderRadius: '8px',
+      backgroundColor: 'transparent',
+      overflow: 'auto',
+      display: 'block',
+      flexGrow: 1,
+    });
+
+    iframe.src = painelURL;
+
+    container.appendChild(closeBtn);
+    container.appendChild(iframe);
+    overlay.appendChild(container);
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) toggleModal(false);
+    });
+  }
+
+  function toggleModal(forceShow) {
+    const modal = document.getElementById('custom_modal');
+    if (!modal) return;
+
+    if (typeof forceShow === 'boolean') {
+      if (forceShow) {
+        modal.style.display = 'flex';
+        void modal.offsetWidth; // força reflow para ativar transição
+        modal.style.opacity = '1';
+        localStorage.setItem(STORAGE_KEY, 'true');
+      } else {
+        modal.style.opacity = '0';
+        modal.addEventListener('transitionend', () => {
+          modal.style.display = 'none';
+        }, { once: true });
+        localStorage.setItem(STORAGE_KEY, 'false');
+      }
+    } else {
+      if (modal.style.display === 'flex') {
+        toggleModal(false);
+      } else {
+        toggleModal(true);
+      }
+    }
+  }
+
+  function init() {
+    createButton();
+    createModal();
+
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      toggleModal(true);
+    }
+  }
+
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(init, 0);
+  } else {
+    document.addEventListener('DOMContentLoaded', init);
+  }
+})();

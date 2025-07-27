@@ -9,7 +9,6 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    position: relative;
     font-family: 'Montserrat', sans-serif;
     color: #eee;
     display: flex;
@@ -30,9 +29,12 @@
     background-color: rgba(0,0,0,0.5);
     z-index: -1;
   }
-  #menu, #console-toggle {
+  /* Sidebar menu */
+  #menu {
     position: fixed;
     top: 30px;
+    left: 30px;
+    width: 80px;
     background-color: rgba(0,0,0,0.6);
     border-radius: 20px;
     padding: 10px 0;
@@ -40,14 +42,10 @@
     flex-direction: column;
     gap: 20px;
     align-items: center;
+    min-height: 100px;
     z-index: 10;
   }
-  #menu {
-    left: 30px;
-    width: 80px;
-    min-height: 100px;
-  }
-  #menu button, #console-toggle button {
+  #menu button {
     cursor: pointer;
     user-select: none;
     display: flex;
@@ -61,8 +59,7 @@
     transition: background-color 0.2s ease;
   }
   #menu button:hover,
-  #menu button.active,
-  #console-toggle button:hover {
+  #menu button.active {
     background-color: rgba(255,255,255,0.2);
   }
   #menu button img {
@@ -71,25 +68,43 @@
     pointer-events: none;
     user-select: none;
   }
+  /* Console toggle button next to menu */
   #console-toggle {
-    right: 30px;
+    position: fixed;
     top: 30px;
-    width: 80px;
+    left: 125px; /* 30 + 80(menu width) + 15 spacing */
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    z-index: 10;
   }
-  #console-toggle button img {
-    width: 32px;
-    height: 32px;
+  #console-toggle:hover {
+    background-color: rgba(255,255,255,0.2);
   }
+  #console-toggle img {
+    width: 28px;
+    height: 28px;
+    pointer-events: none;
+    user-select: none;
+  }
+  /* Main content */
   #content {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    margin-left: 160px; /* espaço para menu + console */
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 140px; /* espaço para menu */
-    margin-right: 140px; /* espaço para botão console */
   }
+  /* Panel */
   #func-panel {
     background: rgba(0,0,0,0.8);
     border-radius: 12px;
@@ -135,6 +150,7 @@
     user-select: none;
     width: 240px;
   }
+  /* Switch styling */
   .switch {
     position: relative;
     display: inline-block;
@@ -171,7 +187,7 @@
   input:checked + .slider:before {
     transform: translateX(24px);
   }
-  /* Radio buttons style */
+  /* Radio buttons */
   .radio-group input[type="radio"] {
     margin-right: 8px;
     cursor: pointer;
@@ -213,11 +229,12 @@
     opacity: 0;
     transition: opacity 0.15s ease-in-out;
   }
+  /* Console */
   #console {
     position: fixed;
     bottom: 20px;
-    right: 30px;
-    width: 360px;
+    left: 30px;
+    width: 600px;
     max-height: 250px;
     background: #222;
     border-radius: 8px;
@@ -246,10 +263,8 @@
     </button>
   </nav>
 
-  <div id="console-toggle" aria-label="Botão para abrir e fechar console">
-    <button type="button" title="Abrir/Fechar Console" aria-pressed="false" aria-controls="console">
-      <img src="https://cdn-icons-png.flaticon.com/512/565/565547.png" alt="Ícone Console" />
-    </button>
+  <div id="console-toggle" role="button" aria-pressed="false" tabindex="0" aria-label="Abrir/Fechar console">
+    <img src="https://cdn-icons-png.flaticon.com/512/565/565547.png" alt="Ícone Console" />
   </div>
 
   <main id="content" tabindex="-1">
@@ -315,7 +330,7 @@
       const saveSwitch = document.getElementById('save-config-switch');
       const enableSwitch = document.getElementById('enable-module-switch');
       const consoleEl = document.getElementById('console');
-      const consoleToggleBtn = document.querySelector('#console-toggle button');
+      const consoleToggle = document.getElementById('console-toggle');
       const construcaoOptions = document.getElementById('construcao-options');
       const farmOptions = document.getElementById('farm-options');
 
@@ -356,11 +371,9 @@
         saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
         enableSwitch.checked = localStorage.getItem(LS_ENABLE_PREFIX + func) === 'true';
 
-        // Mostrar opções específicas por função
         construcaoOptions.style.display = func === 'construcao' ? 'flex' : 'none';
         farmOptions.style.display = func === 'farm' ? 'flex' : 'none';
 
-        // Carregar radios salvos
         if(func === 'construcao') {
           const savedRadio = localStorage.getItem(LS_RADIO_CONSTRUCAO + func) || 'padrao';
           const radios = construcaoOptions.querySelectorAll('input[type="radio"]');
@@ -405,7 +418,6 @@
         log(`Habilitar Módulo alterado para ${enableSwitch.checked} em ${currentFunc}`);
       });
 
-      // Radio construcao
       construcaoOptions.querySelectorAll('input[type="radio"]').forEach(radio => {
         radio.addEventListener('change', () => {
           if (!currentFunc) return;
@@ -414,7 +426,6 @@
         });
       });
 
-      // Radio farm
       farmOptions.querySelectorAll('input[type="radio"]').forEach(radio => {
         radio.addEventListener('change', () => {
           if (!currentFunc) return;
@@ -440,22 +451,28 @@
         }
       });
 
-      // Toggle console
-      consoleToggleBtn.addEventListener('click', () => {
-        const visible = consoleEl.style.display === 'block';
-        if (visible) {
+      consoleToggle.addEventListener('click', () => {
+        const isOpen = consoleEl.style.display === 'block';
+        if(isOpen) {
           consoleEl.style.display = 'none';
-          consoleToggleBtn.setAttribute('aria-pressed', 'false');
+          consoleToggle.setAttribute('aria-pressed', 'false');
           log('Console fechado');
         } else {
           consoleEl.style.display = 'block';
-          consoleToggleBtn.setAttribute('aria-pressed', 'true');
+          consoleToggle.setAttribute('aria-pressed', 'true');
           log('Console aberto');
           consoleEl.focus();
         }
       });
 
-      // Abre automaticamente o painel da primeira função e o menu aberto
+      consoleToggle.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          consoleToggle.click();
+        }
+      });
+
+      // Inicializa painel aberto e menu ativo
       updatePanel(currentFunc);
     });
   </script>

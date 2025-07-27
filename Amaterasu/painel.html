@@ -10,7 +10,7 @@
     margin: 0; padding: 0;
     height: 100%;
     background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center center fixed;
-    background-size: cover !important;
+    background-size: 100% 100% !important; /* ESTENDER */
     background-color: rgba(0,0,0,0.5);
     background-blend-mode: darken;
     font-family: 'Montserrat', sans-serif;
@@ -151,6 +151,9 @@
     <button type="button" data-func="recrutamento" title="Recrutamento Automático" aria-pressed="false">
       <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutamento Automático">
     </button>
+    <button type="button" data-func="mercado" title="Mercado Automático" aria-pressed="false">
+      <img src="https://cdn-icons-png.flaticon.com/512/833/833314.png" alt="Mercado Automático">
+    </button>
   </nav>
 
   <main id="content" tabindex="-1">
@@ -191,14 +194,20 @@
       const descriptions = {
         construcao: "Automatiza a construção e melhoria de edifícios.",
         farm: "Gerencia ataques automáticos para coletar recursos.",
-        recrutamento: "Controla o recrutamento automático de tropas."
+        recrutamento: "Controla o recrutamento automático de tropas.",
+        mercado: "Gerencia negociações automáticas no mercado."
       };
 
       let currentFunc = null;
 
+      // Mapeia botões pelo nome da função
+      const buttonsNamed = {};
+      buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
+
       function updatePanel(func) {
         currentFunc = func;
-        funcTitle.textContent = buttonsNamed[func].title || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
+        const btn = buttonsNamed[func];
+        funcTitle.textContent = btn?.querySelector('img')?.alt || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
         funcDesc.textContent = descriptions[func] || '';
 
         saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
@@ -208,15 +217,11 @@
 
         buttons.forEach(btn => {
           btn.classList.toggle('active', btn.dataset.func === func);
-          btn.setAttribute('aria-pressed', btn.dataset.func === func);
+          btn.setAttribute('aria-pressed', btn.dataset.func === func ? 'true' : 'false');
         });
 
         funcPanel.focus();
       }
-
-      // Criar um objeto para facilitar acesso ao botão pelo nome
-      const buttonsNamed = {};
-      buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
 
       buttons.forEach(btn => {
         btn.addEventListener('click', () => updatePanel(btn.dataset.func));

@@ -9,7 +9,6 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    position: relative;
     font-family: 'Montserrat', sans-serif;
     color: #eee;
     display: flex;
@@ -20,7 +19,7 @@
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center center fixed;
-    background-size: 100% 100%;
+    background-size: cover;
     z-index: -2;
   }
   body::after {
@@ -30,11 +29,37 @@
     background-color: rgba(0,0,0,0.5);
     z-index: -1;
   }
+
+  /* BOTÃO TOGGLE SIDEBAR */
+  #toggle-sidebar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    width: 36px;
+    height: 36px;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    border-radius: 6px;
+    color: #eee;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  #toggle-sidebar:hover {
+    background: rgba(0,0,0,0.9);
+  }
+
+  /* MENU LATERAL */
   #menu {
     width: 80px;
     background-color: rgba(0,0,0,0.6);
     border-radius: 20px;
-    margin: 30px 0;
+    margin: 70px 0 30px 10px;
     padding: 10px 0;
     display: flex;
     flex-direction: column;
@@ -42,6 +67,12 @@
     align-self: center;
     min-height: 100px;
     align-items: center;
+    transition: width 0.3s ease;
+    overflow: hidden;
+  }
+  #menu.collapsed {
+    width: 40px;
+    margin-left: 10px;
   }
   #menu button {
     cursor: pointer;
@@ -55,6 +86,11 @@
     border: none;
     background: transparent;
     transition: background-color 0.2s ease;
+    overflow: visible;
+  }
+  #menu.collapsed button {
+    width: 32px;
+    height: 32px;
   }
   #menu button:hover,
   #menu button.active {
@@ -65,42 +101,54 @@
     height: 32px;
     pointer-events: none;
     user-select: none;
+    transition: width 0.3s, height 0.3s;
   }
+  #menu.collapsed button img {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* ÁREA DE CONTEÚDO */
   #content {
     flex: 1;
     padding: 20px;
-    overflow-y: auto;
+    overflow: visible;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+
+  /* PAINEL DE FUNÇÕES */
   #func-panel {
     background: rgba(0,0,0,0.9);
     border-radius: 12px;
     padding: 30px 40px 20px 40px;
     box-shadow: 0 0 20px #000;
     color: #eee;
-    max-width: 600px;
-    width: 90vw;
-    max-height: 80vh;
+    width: 65vw;
+    max-width: 900px;
+    height: 65vh;
+    max-height: 700px;
     display: none;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     margin: auto;
+    overflow-y: auto;
   }
   #func-panel:focus {
     outline: 2px solid #4caf50;
     outline-offset: 4px;
   }
+
   #func-title {
     margin: 0 0 10px 0;
     font-weight: 600;
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     text-align: center;
   }
   #func-desc {
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: #ccc;
     margin: 0 0 20px 0;
     text-align: center;
@@ -173,6 +221,8 @@
 </style>
 </head>
 <body>
+  <button id="toggle-sidebar" aria-label="Alternar menu lateral" title="Abrir/Fechar menu">☰</button>
+
   <nav id="menu" role="navigation" aria-label="Menu de funções">
     <button type="button" data-func="construcao" title="Construção Automática" aria-pressed="false">
       <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construção Automática" />
@@ -211,7 +261,9 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const buttons = document.querySelectorAll('#menu button');
+      const toggleBtn = document.getElementById('toggle-sidebar');
+      const menu = document.getElementById('menu');
+      const buttons = menu.querySelectorAll('button');
       const funcPanel = document.getElementById('func-panel');
       const funcTitle = document.getElementById('func-title');
       const funcDesc = document.getElementById('func-desc');
@@ -245,7 +297,7 @@
         consoleEl.scrollTop = consoleEl.scrollHeight;
       }
 
-      function updatePanel(func, logMessages = true) {
+      function updatePanel(func) {
         currentFunc = func;
         const btn = buttonsNamed[func];
         funcTitle.textContent = btn?.querySelector('img')?.alt || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
@@ -261,17 +313,28 @@
           btn.setAttribute('aria-pressed', btn.dataset.func === func ? 'true' : 'false');
         });
 
-        if (logMessages) {
-          log(`Painel aberto: ${funcTitle.textContent}`);
-          log(`Salvar Configuração: ${saveSwitch.checked}`);
-          log(`Habilitar Módulo: ${enableSwitch.checked}`);
-        }
+        log(`Painel aberto: ${funcTitle.textContent}`);
+        log(`Salvar Configuração: ${saveSwitch.checked}`);
+        log(`Habilitar Módulo: ${enableSwitch.checked}`);
 
         funcPanel.focus();
       }
 
       buttons.forEach(btn => {
-        btn.addEventListener('click', () => updatePanel(btn.dataset.func));
+        btn.addEventListener('click', () => {
+          if (currentFunc === btn.dataset.func && funcPanel.style.display === 'flex') {
+            // Se clicar no botão ativo, fecha o painel
+            funcPanel.style.display = 'none';
+            log(`Painel fechado`);
+            currentFunc = null;
+            buttons.forEach(b => {
+              b.classList.remove('active');
+              b.setAttribute('aria-pressed', 'false');
+            });
+            return;
+          }
+          updatePanel(btn.dataset.func);
+        });
       });
 
       saveSwitch.addEventListener('change', () => {
@@ -290,15 +353,11 @@
         if (
           funcPanel.style.display === 'flex' &&
           !funcPanel.contains(e.target) &&
-          !e.target.closest('#menu')
+          !e.target.closest('#menu') &&
+          e.target !== toggleBtn
         ) {
           funcPanel.style.display = 'none';
           log(`Painel fechado`);
-          if(currentFunc && buttonsNamed[currentFunc]) {
-            buttonsNamed[currentFunc].focus();
-          } else {
-            buttons[0].focus();
-          }
           currentFunc = null;
           buttons.forEach(btn => {
             btn.classList.remove('active');
@@ -307,8 +366,9 @@
         }
       });
 
-      // Abre automaticamente o painel da primeira função, sem logs
-      updatePanel('construcao', false);
+      toggleBtn.addEventListener('click', () => {
+        menu.classList.toggle('collapsed');
+      });
     });
   </script>
 </body>

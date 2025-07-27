@@ -12,7 +12,8 @@
   'use strict';
 
   const gifURL = "https://cdn.pixabay.com/animation/2023/01/19/18/24/18-24-20-426_512.gif";
-  const painelURL = "https://play2market.github.io/painel.html";
+  // Corrigido para refletir o caminho correto no GitHub Pages
+  const painelURL = "https://play2market.github.io/Amaterasu/painel.html";
   const STORAGE_KEY = 'amaterasu_modal_aberto';
 
   function createButton() {
@@ -148,8 +149,7 @@
     if (typeof forceShow === 'boolean') {
       if (forceShow) {
         modal.style.display = 'flex';
-        // força reflow para ativar transição
-        void modal.offsetWidth;
+        void modal.offsetWidth; // força reflow para ativar transição
         modal.style.opacity = '1';
         localStorage.setItem(STORAGE_KEY, 'true');
       } else {

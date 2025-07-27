@@ -9,14 +9,26 @@
   html, body {
     margin: 0; padding: 0;
     height: 100%;
-    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center center fixed;
-    background-size: 100% 100% !important; /* ESTENDER */
-    background-color: rgba(0,0,0,0.5);
-    background-blend-mode: darken;
+    position: relative;
     font-family: 'Montserrat', sans-serif;
     color: #eee;
     display: flex;
     overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center center fixed;
+    background-size: 100% 100%;
+    z-index: -2;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: -1;
   }
   #menu {
     width: 80px;
@@ -74,6 +86,10 @@
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+  }
+  #func-panel:focus {
+    outline: 2px solid #4caf50;
+    outline-offset: 4px;
   }
   #func-title {
     margin: 0 0 10px 0;
@@ -157,7 +173,7 @@
   </nav>
 
   <main id="content" tabindex="-1">
-    <section id="func-panel" aria-live="polite" aria-label="Painel de configuração">
+    <section id="func-panel" tabindex="-1" aria-live="polite" aria-label="Painel de configuração">
       <h2 id="func-title">Configuração</h2>
       <p id="func-desc">Descrição da função selecionada aparecerá aqui.</p>
       <div class="switch-group">
@@ -200,7 +216,6 @@
 
       let currentFunc = null;
 
-      // Mapeia botões pelo nome da função
       const buttonsNamed = {};
       buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
 

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Recrutador Automático Avançado
-// @version      1.7
-// @description  Recrutamento respeitando total, filas e intervalo aleatório 5~15 min com logs detalhados
+// @version      1.7.3
+// @description  Recrutamento respeitando total, filas (máx 2), delay clique configurável e intervalo reload configurável com logs detalhados
 // @author       Triky, GPT e Victor Garé
 // @match        https://*.tribalwars.com.br/*&screen=train*
 // @match        https://*.tribalwars.com.br/*&screen=stable*
@@ -12,6 +12,12 @@
 
 (function () {
   'use strict';
+
+  // --- Configurações personalizáveis ---
+  const delayCliqueMin = 1000;        // 1 segundo
+  const delayCliqueMax = 3000;        // 3 segundos
+  const intervaloReloadMin = 5 * 60 * 1000;  // 5 minutos
+  const intervaloReloadMax = 15 * 60 * 1000; // 15 minutos
 
   const tropasDesejadas = {
     spear: { total: 3000, porVez: 1 },
@@ -24,7 +30,7 @@
     catapult: { total: 30, porVez: 0 },
   };
 
-  const maxFilasPorTropa = 2;
+  const maxFilasTotais = 2;
 
   function aleatorio(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -77,31 +83,39 @@
   function recrutar() {
     let algumaTropaRecrutada = false;
 
+    // Contar quantas tropas já têm fila ativa (>=1 unidade)
+    let totalFilasAtuais = 0;
+    for (const unidade in tropasDesejadas) {
+      if (contarUnidadesNaFila(unidade) > 0) {
+        totalFilasAtuais++;
+      }
+    }
+
     $('tr.row_a, tr.row_b').each(function () {
+      if (totalFilasAtuais >= maxFilasTotais) {
+        console.log('Limite de filas totais atingido. Recrutamento pausado.');
+        return false; // Encerra o .each
+      }
+
       const unidade = $(this).find('a.unit_link').data('unit');
       if (!unidade) return;
 
       const config = tropasDesejadas[unidade];
-      if (!config) return;
-
-      if (config.total <= 0 || config.porVez <= 0) {
-        console.log(`Unidade ${unidade} com total ou porVez zero, ignorando.`);
+      if (!config || config.total <= 0 || config.porVez <= 0) {
         return;
       }
 
       const unidadesNaFila = contarUnidadesNaFila(unidade);
-      if (unidadesNaFila >= maxFilasPorTropa) {
-        console.log(`Unidade ${unidade} tem ${unidadesNaFila} na fila, >= limite ${maxFilasPorTropa}. Ignorando.`);
+      if (unidadesNaFila > 0) {
+        console.log(`Unidade ${unidade} já possui fila. Ignorando.`);
         return;
       }
 
-      // Pega o texto tipo "94/215"
       const statusTexto = $(this).find('td').eq(2).text().trim();
       const totalAtual = parseInt(statusTexto.split('/')[1], 10) || 0;
+      const faltam = config.total - totalAtual;
 
-      const faltam = config.total - totalAtual - unidadesNaFila;
-
-      console.log(`Unidade ${unidade}: total desejado ${config.total}, na aldeia ${totalAtual}, na fila ${unidadesNaFila}, faltam ${faltam}`);
+      console.log(`Unidade ${unidade}: total desejado ${config.total}, na aldeia ${totalAtual}, faltam ${faltam}`);
 
       if (faltam <= 0) {
         console.log(`Unidade ${unidade} já atingiu ou ultrapassou o total desejado.`);
@@ -118,6 +132,7 @@
         if (input.length > 0 && !input.parent().is(':hidden')) {
           input.val(qtdRecrutar);
           algumaTropaRecrutada = true;
+          totalFilasAtuais++;
           console.log(`Preenchendo recrutamento de ${qtdRecrutar} para unidade ${unidade}`);
         }
       } else {
@@ -126,8 +141,12 @@
     });
 
     if (algumaTropaRecrutada) {
-      $('.btn-recruit').click();
-      console.log('Botão de recrutamento clicado.');
+      const delayClique = aleatorio(delayCliqueMin, delayCliqueMax);
+      console.log(`Aguardando ${delayClique} ms antes de clicar no botão de recrutamento.`);
+      setTimeout(() => {
+        $('.btn-recruit').click();
+        console.log('Botão de recrutamento clicado.');
+      }, delayClique);
     } else {
       console.log('Nenhuma tropa para recrutar no momento.');
     }
@@ -136,7 +155,7 @@
   $(document).ready(function () {
     recrutar();
 
-    const intervalo = aleatorio(5 * 60 * 1000, 15 * 60 * 1000);
+    const intervalo = aleatorio(intervaloReloadMin, intervaloReloadMax);
     console.log(`Recarregando página em aproximadamente ${Math.round(intervalo / 60000)} minutos.`);
     setTimeout(() => {
       location.reload(true);

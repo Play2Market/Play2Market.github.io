@@ -29,14 +29,14 @@
 
   // Configuração de quantas tropas e quantas unidades recrutar por vez para cada tipo
   const tropasDesejadas = {
-    spear: { total: 3000, porVez: 1 },    // Lanceiros
-    sword: { total: 3000, porVez: 1 },    // Espadachins
-    axe: { total: 0, porVez: 0 },         // Bárbaros (não recrutar)
+    spear: { total: 3000, porVez: 10 },    // Lanceiros
+    sword: { total: 3000, porVez: 10 },    // Espadachins
+    axe: { total: 0, porVez: 1 },         // Bárbaros (não recrutar)
     spy: { total: 200, porVez: 1 },       // Exploradores
     light: { total: 500, porVez: 1 },     // Cavalaria leve
-    heavy: { total: 300, porVez: 1 },     // Cavalaria pesada
-    ram: { total: 30, porVez: 0 },        // Aríetes (não recrutar)
-    catapult: { total: 30, porVez: 0 },   // Catapultas (não recrutar)
+    heavy: { total: 10, porVez: 1 },     // Cavalaria pesada
+    ram: { total: 30, porVez: 1 },        // Aríetes (não recrutar)
+    catapult: { total: 30, porVez: 1 },   // Catapultas (não recrutar)
   };
 
   // Limite total de filas ativas simultâneas para todas as tropas (somadas)

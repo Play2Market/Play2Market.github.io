@@ -34,13 +34,13 @@
     axe: { total: 0, porVez: 0 },         // Bárbaros (não recrutar)
     spy: { total: 200, porVez: 1 },       // Exploradores
     light: { total: 500, porVez: 1 },     // Cavalaria leve
-    heavy: { total: 300, porVez: 0 },     // Cavalaria pesada (não recrutar)
+    heavy: { total: 300, porVez: 1 },     // Cavalaria pesada (não recrutar)
     ram: { total: 30, porVez: 0 },        // Aríetes (não recrutar)
     catapult: { total: 30, porVez: 0 },   // Catapultas (não recrutar)
   };
 
   // Limite total de filas ativas simultâneas para todas as tropas (somadas)
-  const maxFilasTotais = 2;
+  const maxFilasTotais = 8;
 
   /**
    * Retorna um número inteiro aleatório entre min e max (inclusive).

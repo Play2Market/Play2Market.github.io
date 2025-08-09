@@ -134,10 +134,12 @@ body::after {
   max-width: 900px;
   height: 65vh;
   max-height: 700px;
-  display: none;
+
+  display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: center;  /* centraliza vertical */
+  align-items: center;      /* centraliza horizontal */
+
   margin: auto;
   overflow-y: auto;
 }

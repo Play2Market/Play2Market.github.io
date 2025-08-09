@@ -118,9 +118,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // --- NOVA FUNÇÃO: Recolher/Mostrar menu lateral ---
+
   toggleBtn.addEventListener('click', () => {
-    menu.classList.toggle('collapsed');
+    if (menu.style.display === 'none') {
+      menu.style.display = 'flex';    // mostrar menu
+      toggleBtn.style.display = 'flex'; // mostrar botão
+      const showBtn = document.getElementById('show-menu-btn');
+      if (showBtn) showBtn.remove();
+    } else {
+      menu.style.display = 'none';    // esconder menu
+      toggleBtn.style.display = 'none'; // esconder botão
+      createShowMenuButton();
+    }
   });
+
+  function createShowMenuButton() {
+    if (document.getElementById('show-menu-btn')) return;
+
+    const showBtn = document.createElement('button');
+    showBtn.id = 'show-menu-btn';
+    showBtn.textContent = '☰';
+    Object.assign(showBtn.style, {
+      position: 'fixed',
+      top: '10px',
+      left: '10px',
+      width: '36px',
+      height: '36px',
+      background: 'rgba(0,0,0,0.7)',
+      border: 'none',
+      borderRadius: '6px',
+      color: '#eee',
+      fontSize: '24px',
+      cursor: 'pointer',
+      zIndex: '20',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      userSelect: 'none',
+      transition: 'background-color 0.3s',
+    });
+    showBtn.title = 'Mostrar menu';
+
+    showBtn.addEventListener('click', () => {
+      menu.style.display = 'flex';
+      toggleBtn.style.display = 'flex';
+      showBtn.remove();
+    });
+
+    document.body.appendChild(showBtn);
+  }
 
   // Não abrir painel automaticamente
   // Apenas mostrar ao clicar no menu

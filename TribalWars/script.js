@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Menu lateral recolher/mostrar
+  // Menu lateral desaparece/aparece
   toggleBtn.addEventListener('click', () => {
     if (menu.classList.contains('collapsed')) {
       menu.classList.remove('collapsed');
@@ -181,6 +181,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Não abrir painel automaticamente
-  // Apenas mostrar ao clicar no menu
 });

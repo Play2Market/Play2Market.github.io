@@ -137,8 +137,8 @@ body::after {
 
   display: flex;
   flex-direction: column;
-  justify-content: center;  /* centraliza vertical */
-  align-items: center;      /* centraliza horizontal */
+  justify-content: center;
+  align-items: center;
 
   margin: auto;
   overflow-y: auto;
@@ -246,11 +246,12 @@ input:checked + .slider:before {
   transform: translateX(24px);
 }
 
-/* Console panel */
+/* Console panel centralizado na parte inferior */
 #console-panel {
   position: fixed;
   bottom: 10px;
-  right: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 320px;
   max-height: 200px;
   background: #222;

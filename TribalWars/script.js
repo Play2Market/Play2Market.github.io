@@ -118,17 +118,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- NOVA FUNÇÃO: Recolher/Mostrar menu lateral ---
+  // --- NOVA FUNÇÃO: Recolher/Mostrar menu lateral usando .collapsed ---
 
   toggleBtn.addEventListener('click', () => {
-    if (menu.style.display === 'none') {
-      menu.style.display = 'flex';    // mostrar menu
-      toggleBtn.style.display = 'flex'; // mostrar botão
+    if (menu.classList.contains('collapsed')) {
+      menu.classList.remove('collapsed');
+      toggleBtn.style.display = 'flex';
       const showBtn = document.getElementById('show-menu-btn');
       if (showBtn) showBtn.remove();
     } else {
-      menu.style.display = 'none';    // esconder menu
-      toggleBtn.style.display = 'none'; // esconder botão
+      menu.classList.add('collapsed');
+      toggleBtn.style.display = 'none';
       createShowMenuButton();
     }
   });
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showBtn.title = 'Mostrar menu';
 
     showBtn.addEventListener('click', () => {
-      menu.style.display = 'flex';
+      menu.classList.remove('collapsed');
       toggleBtn.style.display = 'flex';
       showBtn.remove();
     });

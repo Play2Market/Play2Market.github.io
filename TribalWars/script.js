@@ -7,18 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const funcDesc = document.getElementById('func-desc');
   const saveSwitch = document.getElementById('save-config-switch');
   const enableSwitch = document.getElementById('enable-module-switch');
-  const consoleEl = document.getElementById('console');
+  const consolePanel = document.getElementById('console-panel');
 
   const btnPadrao = document.getElementById('btn-padrao');
   const btnRecursos = document.getElementById('btn-recursos');
+
+  const toggleConsoleBtn = document.getElementById('toggle-console');
 
   const LS_SAVE_PREFIX = 'saveConfig_';
   const LS_ENABLE_PREFIX = 'enableModule_';
 
   const descriptions = {
-    construcao: "Automatiza a construção e melhoria de edifícios.",
-    farm: "Gerencia ataques automáticos para coletar recursos.",
-    recrutamento: "Controla o recrutamento automático de tropas."
+    construtor: "Automatiza a construção e melhoria de edifícios.",
+    saqueador: "Gerencia ataques automáticos para coletar recursos.",
+    recrutador: "Controla o recrutamento automático de tropas.",
+    equalizador: "Balanceia os recursos para otimizar seu uso."
   };
 
   let currentFunc = null;
@@ -34,8 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function log(msg) {
     const line = document.createElement('div');
     line.textContent = `${timestamp()} ${msg}`;
-    consoleEl.appendChild(line);
-    consoleEl.scrollTop = consoleEl.scrollHeight;
+    consolePanel.appendChild(line);
+    consolePanel.scrollTop = consolePanel.scrollHeight;
   }
 
   function setActiveButton(selectedBtn) {
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updatePanel(func) {
     currentFunc = func;
     const btn = buttonsNamed[func];
-    funcTitle.textContent = btn?.querySelector('img')?.alt || func.charAt(0).toUpperCase() + func.slice(1) + ' Automático';
+    funcTitle.textContent = btn?.querySelector('img')?.alt || func.charAt(0).toUpperCase() + func.slice(1);
     funcDesc.textContent = descriptions[func] || '';
 
     saveSwitch.checked = localStorage.getItem(LS_SAVE_PREFIX + func) === 'true';
@@ -106,7 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
       funcPanel.style.display === 'flex' &&
       !funcPanel.contains(e.target) &&
       !e.target.closest('#menu') &&
-      e.target !== toggleBtn
+      e.target !== toggleBtn &&
+      e.target !== toggleConsoleBtn
     ) {
       funcPanel.style.display = 'none';
       log(`Painel fechado`);
@@ -118,8 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- NOVA FUNÇÃO: Recolher/Mostrar menu lateral usando .collapsed ---
-
+  // Menu lateral recolher/mostrar
   toggleBtn.addEventListener('click', () => {
     if (menu.classList.contains('collapsed')) {
       menu.classList.remove('collapsed');
@@ -168,6 +171,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.body.appendChild(showBtn);
   }
+
+  // Controle do console lateral
+  toggleConsoleBtn.addEventListener('click', () => {
+    if (consolePanel.style.display === 'none' || consolePanel.style.display === '') {
+      consolePanel.style.display = 'block';
+    } else {
+      consolePanel.style.display = 'none';
+    }
+  });
 
   // Não abrir painel automaticamente
   // Apenas mostrar ao clicar no menu

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Menu com Modais Embutidos</title>
+<title>Painel com Conteúdo Externo</title>
 <style>
   body {
     font-family: 'Montserrat', sans-serif;
@@ -20,7 +20,6 @@
     z-index: -1;
   }
 
-  /* Menu lateral */
   #menu {
     position: fixed;
     top: 50%;
@@ -70,7 +69,6 @@
     width: 24px; height: 24px;
   }
 
-  /* Botão alternar menu */
   #toggle-sidebar {
     position: fixed; top: 10px; left: 10px;
     width: 36px; height: 36px;
@@ -86,7 +84,6 @@
     background: rgba(0,0,0,0.9);
   }
 
-  /* Modal */
   #modalOverlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -107,14 +104,6 @@
     box-shadow: 0 0 15px black;
     position: relative;
     color: #eee;
-  }
-  #modalWindow h2 {
-    margin-top: 0;
-    font-size: 1.6em;
-  }
-  #modalWindow ul {
-    padding-left: 20px;
-    margin-top: 0;
   }
   #closeModal {
     position: absolute;
@@ -139,23 +128,22 @@
 </button>
 
 <nav id="menu" role="navigation" aria-label="Menu de funções">
-  <button id="btnConstrutor" type="button" title="Construtor" aria-haspopup="dialog" aria-controls="modalOverlay">
+  <button data-file="A3_MenuConstrutor.html" title="Construtor" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
   </button>
-  <button id="btnSaqueador" type="button" title="Saqueador" aria-haspopup="dialog" aria-controls="modalOverlay">
+  <button data-file="A3_MenuSaqueador.html" title="Saqueador" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
   </button>
-  <button id="btnRecrutador" type="button" title="Recrutador" aria-haspopup="dialog" aria-controls="modalOverlay">
+  <button data-file="A3_MenuRecrutador.html" title="Recrutador" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
   </button>
 </nav>
 
-<!-- Modal -->
 <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
   <div id="modalWindow">
     <button id="closeModal" aria-label="Fechar janela">&times;</button>
     <div id="modalContent">
-      <!-- Conteúdo dinâmico aqui -->
+      <!-- Conteúdo carregado via fetch -->
     </div>
   </div>
 </div>
@@ -165,7 +153,6 @@
   const menu = document.getElementById('menu');
   const STORAGE_KEY = 'menu_collapsed_preference';
 
-  // Restaurar preferência de menu
   if(localStorage.getItem(STORAGE_KEY) === 'true') {
     menu.classList.add('collapsed');
   }
@@ -175,64 +162,48 @@
     localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
   });
 
-  // Modais
   const modalOverlay = document.getElementById('modalOverlay');
   const modalContent = document.getElementById('modalContent');
   const closeModalBtn = document.getElementById('closeModal');
 
-  // Conteúdos dos menus
-  const contents = {
-    construtor: `
-      <h2 id="modalTitle">Construtor</h2>
-      <p id="modalDesc">Ferramentas e funções para construir.</p>
-      <ul>
-        <li>Construir casas</li>
-        <li>Expandir fazenda</li>
-        <li>Melhorar muralha</li>
-      </ul>
-    `,
-    saqueador: `
-      <h2 id="modalTitle">Saqueador</h2>
-      <p id="modalDesc">Funções para organizar ataques e saques.</p>
-      <ul>
-        <li>Planejar ataque</li>
-        <li>Enviar tropas</li>
-        <li>Gerenciar saques</li>
-      </ul>
-    `,
-    recrutador: `
-      <h2 id="modalTitle">Recrutador</h2>
-      <p id="modalDesc">Gerencie o recrutamento de tropas.</p>
-      <ul>
-        <li>Treinar soldados</li>
-        <li>Gerenciar filas</li>
-        <li>Recrutar arqueiros</li>
-      </ul>
-    `
-  };
-
-  // Função para abrir modal com conteúdo específico
-  function openModal(key) {
-    modalContent.innerHTML = contents[key];
-    modalOverlay.style.display = 'flex';
+  async function openModalWithFile(url) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Erro ao carregar conteúdo');
+      const html = await response.text();
+      modalContent.innerHTML = html;
+      modalOverlay.style.display = 'flex';
+    } catch (err) {
+      modalContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
+      modalOverlay.style.display = 'flex';
+    }
   }
 
-  // Botões menu
-  document.getElementById('btnConstrutor').addEventListener('click', () => openModal('construtor'));
-  document.getElementById('btnSaqueador').addEventListener('click', () => openModal('saqueador'));
-  document.getElementById('btnRecrutador').addEventListener('click', () => openModal('recrutador'));
-
-  // Fechar modal
   closeModalBtn.addEventListener('click', () => {
     modalOverlay.style.display = 'none';
+    modalContent.innerHTML = ''; // limpa conteúdo
   });
+
   modalOverlay.addEventListener('click', e => {
-    if(e.target === modalOverlay) modalOverlay.style.display = 'none';
+    if(e.target === modalOverlay) {
+      modalOverlay.style.display = 'none';
+      modalContent.innerHTML = '';
+    }
   });
+
   document.addEventListener('keydown', e => {
     if(e.key === "Escape" && modalOverlay.style.display === 'flex') {
       modalOverlay.style.display = 'none';
+      modalContent.innerHTML = '';
     }
+  });
+
+  // Adiciona evento para cada botão do menu
+  menu.querySelectorAll('button[data-file]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const file = btn.getAttribute('data-file');
+      openModalWithFile(file);
+    });
   });
 </script>
 

@@ -113,8 +113,18 @@
   <script>
     const toggleBtn = document.getElementById('toggle-sidebar');
     const menu = document.getElementById('menu');
+    const STORAGE_KEY = 'menu_collapsed_preference';
+
+    // Recupera preferência salvo no localStorage
+    const collapsedPref = localStorage.getItem(STORAGE_KEY);
+    if (collapsedPref === 'true') {
+      menu.classList.add('collapsed');
+    }
+
     toggleBtn.addEventListener('click', () => {
       menu.classList.toggle('collapsed');
+      // Salva preferência atual
+      localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
     });
   </script>
 </body>

@@ -3,21 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Loader com CSS</title>
+<title>Loader 5s</title>
 <style>
-  body, html {
-    margin:0; padding:0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    background: #fff;
-    color: #8d7958;
-  }
-
-  /* Loader animado */
+  /* Loader CSS */
   .loader {
     width: 80px;
     aspect-ratio: 1;
@@ -30,7 +18,7 @@
       linear-gradient(to bottom left ,currentColor 50%,#0000 0%) calc(50% - 10px) calc(50% + 10px) /20px 20px;
     background-repeat: no-repeat;
     -webkit-mask: radial-gradient(circle 5px,#0000 90%,#000);
-    animation: l6 1.5s infinite linear;
+    animation: l6 5s infinite linear;
   }
   .loader:before,
   .loader:after {
@@ -43,34 +31,13 @@
     transform: rotate(120deg);
   }
   @keyframes l6 { 
-    100%{transform: rotate(1turn)}
-  }
-
-  /* Texto abaixo do loader */
-  #loader-text {
-    margin-top: 1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    font-size: 1.5rem;
-    user-select: none;
+    100% { transform: rotate(1turn); }
   }
 </style>
 </head>
 <body>
 
 <div class="loader"></div>
-<div id="loader-text">GEMINI</div>
-<div id="app" style="display:none; margin-top:2rem;">
-  Conteúdo do app carregado.
-</div>
-
-<script>
-  setTimeout(() => {
-    document.querySelector('.loader').style.display = 'none';
-    document.getElementById('loader-text').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  }, 5000);
-</script>
 
 </body>
 </html>

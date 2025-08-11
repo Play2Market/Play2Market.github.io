@@ -234,20 +234,6 @@
   input:checked + .slider:before {
     transform: translateX(24px);
   }
-
-  #console {
-    width: 100%;
-    max-height: 150px;
-    background: #222;
-    border-radius: 8px;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 0.9rem;
-    overflow-y: auto;
-    color: #0f0;
-    box-shadow: inset 0 0 5px #0f0;
-    user-select: text;
-  }
 </style>
 </head>
 <body>
@@ -291,8 +277,6 @@
           </label>
         </label>
       </div>
-
-      <div id="console" aria-live="polite" aria-atomic="false" role="log" tabindex="0"></div>
     </section>
   </main>
 
@@ -306,7 +290,6 @@
       const funcDesc = document.getElementById('func-desc');
       const saveSwitch = document.getElementById('save-config-switch');
       const enableSwitch = document.getElementById('enable-module-switch');
-      const consoleEl = document.getElementById('console');
 
       const btnPadrao = document.getElementById('btn-padrao');
       const btnRecursos = document.getElementById('btn-recursos');
@@ -325,23 +308,10 @@
       const buttonsNamed = {};
       buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
 
-      function timestamp() {
-        const d = new Date();
-        return `[${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}]`;
-      }
-
-      function log(msg) {
-        const line = document.createElement('div');
-        line.textContent = `${timestamp()} ${msg}`;
-        consoleEl.appendChild(line);
-        consoleEl.scrollTop = consoleEl.scrollHeight;
-      }
-
       function setActiveButton(selectedBtn) {
         [btnPadrao, btnRecursos].forEach(btn => {
           btn.classList.toggle('active', btn === selectedBtn);
         });
-        log(`Modo selecionado: ${selectedBtn.textContent}`);
       }
 
       btnPadrao.addEventListener('click', () => setActiveButton(btnPadrao));
@@ -365,10 +335,6 @@
 
         setActiveButton(btnPadrao);
 
-        log(`Painel aberto: ${funcTitle.textContent}`);
-        log(`Salvar Configuração: ${saveSwitch.checked}`);
-        log(`Habilitar Módulo: ${enableSwitch.checked}`);
-
         funcPanel.focus();
       }
 
@@ -376,7 +342,6 @@
         btn.addEventListener('click', () => {
           if (currentFunc === btn.dataset.func && funcPanel.style.display === 'flex') {
             funcPanel.style.display = 'none';
-            log(`Painel fechado`);
             currentFunc = null;
             buttons.forEach(b => {
               b.classList.remove('active');
@@ -391,13 +356,11 @@
       saveSwitch.addEventListener('change', () => {
         if (!currentFunc) return;
         localStorage.setItem(LS_SAVE_PREFIX + currentFunc, saveSwitch.checked);
-        log(`Salvar Configuração alterado para ${saveSwitch.checked} em ${currentFunc}`);
       });
 
       enableSwitch.addEventListener('change', () => {
         if (!currentFunc) return;
         localStorage.setItem(LS_ENABLE_PREFIX + currentFunc, enableSwitch.checked);
-        log(`Habilitar Módulo alterado para ${enableSwitch.checked} em ${currentFunc}`);
       });
 
       document.body.addEventListener('click', e => {
@@ -408,7 +371,6 @@
           e.target !== toggleBtn
         ) {
           funcPanel.style.display = 'none';
-          log(`Painel fechado`);
           currentFunc = null;
           buttons.forEach(btn => {
             btn.classList.remove('active');
@@ -423,7 +385,6 @@
 
       // Não abrir painel automaticamente
       // Apenas mostrar ao clicar no menu
-
     });
   </script>
 </body>

@@ -3,40 +3,71 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Loader GEMINI</title>
+<title>Loader com CSS</title>
 <style>
-  /* Modal texto simples, sem fundo escuro cobrindo a tela */
-  #loader-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Arial', sans-serif;
+  body, html {
+    margin:0; padding:0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background: #fff;
+    color: #8d7958;
+  }
+
+  /* Loader animado */
+  .loader {
+    width: 80px;
+    aspect-ratio: 1;
+    display: grid;
+    color: #8d7958;
+    background:
+      conic-gradient(from -153deg at right,#0000,currentColor 1deg 126deg,#0000 127deg) calc(50% + 5px) 0   /10px 50%,
+      conic-gradient(from   27deg at left ,#0000,currentColor 1deg 126deg,#0000 127deg) calc(50% - 5px) 100%/10px 50%,
+      linear-gradient(to top    right,currentColor 50%,#0000 0%) calc(50% + 10px) calc(50% - 10px) /20px 20px,
+      linear-gradient(to bottom left ,currentColor 50%,#0000 0%) calc(50% - 10px) calc(50% + 10px) /20px 20px;
+    background-repeat: no-repeat;
+    -webkit-mask: radial-gradient(circle 5px,#0000 90%,#000);
+    animation: l6 1.5s infinite linear;
+  }
+  .loader:before,
+  .loader:after {
+    content: "";
+    grid-area: 1/1;
+    background: inherit; 
+    transform: rotate(60deg);
+  }
+  .loader:after {
+    transform: rotate(120deg);
+  }
+  @keyframes l6 { 
+    100%{transform: rotate(1turn)}
+  }
+
+  /* Texto abaixo do loader */
+  #loader-text {
+    margin-top: 1rem;
     font-weight: 700;
     letter-spacing: 0.15em;
-    font-size: 2rem;
-    color: #000;
-    text-shadow: 0 0 5px rgba(0,0,0,0.2);
+    font-size: 1.5rem;
     user-select: none;
-    background: transparent;
-    pointer-events: none; /* para não bloquear cliques */
   }
 </style>
 </head>
 <body>
 
-<div id="loader-modal">
-  GEMINI<br />
-  <span style="font-weight:400; font-size:1rem; letter-spacing: normal;">Assistente de Tarefas</span>
-</div>
-
-<div id="app" style="display:none;">
-  <p>Conteúdo do app carregado.</p>
+<div class="loader"></div>
+<div id="loader-text">GEMINI</div>
+<div id="app" style="display:none; margin-top:2rem;">
+  Conteúdo do app carregado.
 </div>
 
 <script>
   setTimeout(() => {
-    document.getElementById('loader-modal').style.display = 'none';
+    document.querySelector('.loader').style.display = 'none';
+    document.getElementById('loader-text').style.display = 'none';
     document.getElementById('app').style.display = 'block';
   }, 5000);
 </script>

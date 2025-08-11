@@ -41,24 +41,25 @@
     background: rgba(0,0,0,0.9);
   }
 
+  /* Menu com fundo só atrás dos botões, sem margem/padding extras */
   #menu {
-    width: 80px;
     background: rgba(0,0,0,0.6);
     border-radius: 16px;
-    margin: 10px 0 10px 10px;
-    padding: 8px 0;
+    padding: 8px 0;  /* pouco padding para envolver os botões */
     display: flex;
     flex-direction: column;
     gap: 14px;
     align-items: center;
     height: auto;
+    width: 80px;
+    margin: 70px 0 10px 10px; /* posiciona menu conforme antes */
     transition: width 0.3s ease, height 0.3s ease;
-    overflow: visible;
   }
   #menu.collapsed {
     width: 40px;
     margin-left: 10px;
   }
+
   #menu button {
     cursor: pointer;
     user-select: none;
@@ -96,57 +97,24 @@
     </svg>
   </button>
 
-  <nav id="menu" role="navigation" aria-label="Menu de funções"></nav>
+  <nav id="menu" role="navigation" aria-label="Menu de funções">
+    <button type="button" title="Construtor">
+      <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
+    </button>
+    <button type="button" title="Saqueador">
+      <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
+    </button>
+    <button type="button" title="Recrutador">
+      <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
+    </button>
+  </nav>
 
   <script>
     const toggleBtn = document.getElementById('toggle-sidebar');
     const menu = document.getElementById('menu');
-
-    // Função para criar botão dinamicamente
-    function criarBotao({title, imgSrc, alt}) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.title = title;
-      const img = document.createElement('img');
-      img.src = imgSrc;
-      img.alt = alt;
-      btn.appendChild(img);
-      return btn;
-    }
-
-    // Função para atualizar o menu com lista de itens
-    function atualizarMenu(itens) {
-      menu.innerHTML = ''; // limpa
-      itens.forEach(item => {
-        const btn = criarBotao(item);
-        menu.appendChild(btn);
-      });
-    }
-
-    // Exemplo inicial
-    const funcoes = [
-      {title: 'Construtor', imgSrc: 'https://cdn-icons-png.flaticon.com/512/1946/1946433.png', alt: 'Construtor'},
-      {title: 'Saqueador', imgSrc: 'https://cdn-icons-png.flaticon.com/512/5522/5522602.png', alt: 'Saqueador'},
-      {title: 'Recrutador', imgSrc: 'https://cdn-icons-png.flaticon.com/512/2940/2940456.png', alt: 'Recrutador'}
-    ];
-
-    atualizarMenu(funcoes);
-
     toggleBtn.addEventListener('click', () => {
       menu.classList.toggle('collapsed');
     });
-
-    // Exemplo: adicionar função após 3 segundos
-    setTimeout(() => {
-      funcoes.push({title: 'Explorador', imgSrc: 'https://cdn-icons-png.flaticon.com/512/149/149071.png', alt: 'Explorador'});
-      atualizarMenu(funcoes);
-    }, 3000);
-
-    // Exemplo: remover função após 6 segundos
-    setTimeout(() => {
-      funcoes.pop();
-      atualizarMenu(funcoes);
-    }, 6000);
   </script>
 </body>
 </html>

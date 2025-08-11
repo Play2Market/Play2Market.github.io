@@ -96,21 +96,25 @@
   #modalWindow {
     background: #333;
     border-radius: 12px;
-    padding: 15px 20px;
+    padding: 15px 25px;
     overflow-y: auto;
     box-sizing: border-box;
     box-shadow: 0 0 15px black;
     position: relative;
     color: #eee;
-    transition: max-width 0.3s ease, max-height 0.3s ease;
+    transition: width 0.3s ease, height 0.3s ease;
   }
   #modalWindow.large {
     max-width: 70vw;
     max-height: 70vh;
+    width: 70vw;
+    height: 70vh;
   }
   #modalWindow.small {
     max-width: 35vw;
     max-height: 35vh;
+    width: 35vw;
+    height: 35vh;
   }
   #closeModal {
     position: absolute;
@@ -135,19 +139,19 @@
 </button>
 
 <nav id="menu" role="navigation" aria-label="Menu de funções">
-  <button data-file="A3_MenuConstrutor.html" title="Construtor" aria-haspopup="dialog" data-size="small">
+  <button data-file="A3_MenuConstrutor.html" title="Construtor" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
   </button>
-  <button data-file="A3_MenuSaqueador.html" title="Saqueador" aria-haspopup="dialog" data-size="large">
+  <button data-file="A3_MenuSaqueador.html" title="Saqueador" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
   </button>
-  <button data-file="A3_MenuRecrutador.html" title="Recrutador" aria-haspopup="dialog" data-size="large">
+  <button data-file="A3_MenuRecrutador.html" title="Recrutador" aria-haspopup="dialog">
     <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
   </button>
 </nav>
 
 <div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
-  <div id="modalWindow" class="large">
+  <div id="modalWindow" class="small">
     <button id="closeModal" aria-label="Fechar janela">&times;</button>
     <div id="modalContent">
       <!-- Conteúdo carregado via fetch -->
@@ -159,12 +163,7 @@
   const toggleBtn = document.getElementById('toggle-sidebar');
   const menu = document.getElementById('menu');
   const STORAGE_KEY = 'menu_collapsed_preference';
-  const modalOverlay = document.getElementById('modalOverlay');
-  const modalWindow = document.getElementById('modalWindow');
-  const modalContent = document.getElementById('modalContent');
-  const closeModalBtn = document.getElementById('closeModal');
 
-  // Recupera preferência do menu
   if(localStorage.getItem(STORAGE_KEY) === 'true') {
     menu.classList.add('collapsed');
   }
@@ -174,24 +173,32 @@
     localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
   });
 
-  async function openModalWithFile(url, size = 'large') {
-    modalWindow.classList.remove('large', 'small');
-    modalWindow.classList.add(size);
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalContent = document.getElementById('modalContent');
+  const modalWindow = document.getElementById('modalWindow');
+  const closeModalBtn = document.getElementById('closeModal');
+
+  async function openModalWithFile(url) {
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Erro ao carregar conteúdo');
       const html = await response.text();
       modalContent.innerHTML = html;
+      // Define modal como pequeno (metade do tamanho)
+      modalWindow.classList.remove('large');
+      modalWindow.classList.add('small');
       modalOverlay.style.display = 'flex';
     } catch (err) {
       modalContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
+      modalWindow.classList.remove('large');
+      modalWindow.classList.add('small');
       modalOverlay.style.display = 'flex';
     }
   }
 
   closeModalBtn.addEventListener('click', () => {
     modalOverlay.style.display = 'none';
-    modalContent.innerHTML = ''; 
+    modalContent.innerHTML = ''; // limpa conteúdo
   });
 
   modalOverlay.addEventListener('click', e => {
@@ -212,8 +219,7 @@
   menu.querySelectorAll('button[data-file]').forEach(btn => {
     btn.addEventListener('click', () => {
       const file = btn.getAttribute('data-file');
-      const size = btn.getAttribute('data-size') || 'large'; // define tamanho
-      openModalWithFile(file, size);
+      openModalWithFile(file);
     });
   });
 </script>

@@ -304,18 +304,51 @@
       };
 
       let currentFunc = null;
-
       const buttonsNamed = {};
       buttons.forEach(btn => buttonsNamed[btn.dataset.func] = btn);
+
+      let autoFarmScriptLoaded = false;
+
+      function timestamp() {
+        const d = new Date();
+        return `[${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}]`;
+      }
+
+      function log(msg) {
+        console.log(`${timestamp()} ${msg}`);
+      }
 
       function setActiveButton(selectedBtn) {
         [btnPadrao, btnRecursos].forEach(btn => {
           btn.classList.toggle('active', btn === selectedBtn);
         });
+        log(`Modo selecionado: ${selectedBtn.textContent}`);
       }
 
       btnPadrao.addEventListener('click', () => setActiveButton(btnPadrao));
       btnRecursos.addEventListener('click', () => setActiveButton(btnRecursos));
+
+      function carregarScriptAutoFarm() {
+        return new Promise((resolve, reject) => {
+          if (autoFarmScriptLoaded) {
+            resolve();
+            return;
+          }
+          const script = document.createElement('script');
+          script.src = 'https://raw.githubusercontent.com/Play2Market/TribalWars/refs/heads/main/Funcionalidades/AutoFarm.js';
+          script.async = true;
+          script.onload = () => {
+            autoFarmScriptLoaded = true;
+            log('AutoFarm.js carregado com sucesso.');
+            resolve();
+          };
+          script.onerror = () => {
+            log('Falha ao carregar AutoFarm.js');
+            reject(new Error('Falha ao carregar script AutoFarm'));
+          };
+          document.body.appendChild(script);
+        });
+      }
 
       function updatePanel(func) {
         currentFunc = func;
@@ -335,6 +368,21 @@
 
         setActiveButton(btnPadrao);
 
+        if (func === 'farm') {
+          carregarScriptAutoFarm()
+            .then(() => {
+              if (typeof iniciarAutoFarm === 'function') {
+                iniciarAutoFarm();
+                log('AutoFarm iniciado.');
+              } else {
+                log('Função iniciarAutoFarm não encontrada no script carregado.');
+              }
+            })
+            .catch(err => {
+              log('Erro ao iniciar AutoFarm: ' + err.message);
+            });
+        }
+
         funcPanel.focus();
       }
 
@@ -342,6 +390,7 @@
         btn.addEventListener('click', () => {
           if (currentFunc === btn.dataset.func && funcPanel.style.display === 'flex') {
             funcPanel.style.display = 'none';
+            log(`Painel fechado`);
             currentFunc = null;
             buttons.forEach(b => {
               b.classList.remove('active');
@@ -356,11 +405,13 @@
       saveSwitch.addEventListener('change', () => {
         if (!currentFunc) return;
         localStorage.setItem(LS_SAVE_PREFIX + currentFunc, saveSwitch.checked);
+        log(`Salvar Configuração alterado para ${saveSwitch.checked} em ${currentFunc}`);
       });
 
       enableSwitch.addEventListener('change', () => {
         if (!currentFunc) return;
         localStorage.setItem(LS_ENABLE_PREFIX + currentFunc, enableSwitch.checked);
+        log(`Habilitar Módulo alterado para ${enableSwitch.checked} em ${currentFunc}`);
       });
 
       document.body.addEventListener('click', e => {
@@ -371,6 +422,7 @@
           e.target !== toggleBtn
         ) {
           funcPanel.style.display = 'none';
+          log(`Painel fechado`);
           currentFunc = null;
           buttons.forEach(btn => {
             btn.classList.remove('active');
@@ -383,8 +435,6 @@
         menu.classList.toggle('collapsed');
       });
 
-      // Não abrir painel automaticamente
-      // Apenas mostrar ao clicar no menu
     });
   </script>
 </body>

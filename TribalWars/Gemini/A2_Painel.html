@@ -3,59 +3,109 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Loader GEMINI</title>
+<title>Assistente - Painel</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
 <style>
-  /* Tela toda preta semi-transparente */
-  #loader {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: #000;
-    color: #fff;
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Montserrat', sans-serif;
+    color: #eee;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Arial', sans-serif;
-    z-index: 9999;
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center/100% 100% fixed;
+    z-index: -2;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: -1;
   }
 
-  #loader h1 {
-    font-size: 4rem;
-    margin: 0;
-    font-weight: 700;
-    letter-spacing: 0.15em;
+  #toggle-sidebar {
+    position: fixed; top: 10px; left: 10px;
+    width: 36px; height: 36px;
+    background: rgba(0,0,0,0.7);
+    border: none; border-radius: 6px;
+    color: #eee; font-size: 24px;
+    cursor: pointer; z-index: 10;
+    display: flex; justify-content: center; align-items: center;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  #toggle-sidebar:hover {
+    background: rgba(0,0,0,0.9);
   }
 
-  #loader p {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 400;
-    opacity: 0.75;
-    margin-top: 0.5rem;
+  #menu {
+    width: 80px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    margin: 70px 0 30px 10px;
+    padding: 10px 0;
+    display: flex; flex-direction: column;
+    gap: 20px; align-items: center;
+    min-height: 100px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+  }
+  #menu.collapsed {
+    width: 40px;
+    margin-left: 10px;
+  }
+  #menu button {
+    cursor: pointer;
+    user-select: none;
+    width: 48px; height: 48px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    transition: background-color 0.2s ease;
+    display: flex; justify-content: center; align-items: center;
+  }
+  #menu.collapsed button {
+    width: 32px; height: 32px;
+  }
+  #menu button:hover,
+  #menu button.active {
+    background-color: rgba(255,255,255,0.2);
+  }
+  #menu button img {
+    width: 32px; height: 32px;
+    pointer-events: none;
+    user-select: none;
+    transition: width 0.3s, height 0.3s;
+  }
+  #menu.collapsed button img {
+    width: 24px; height: 24px;
   }
 </style>
 </head>
 <body>
+  <button id="toggle-sidebar" aria-label="Alternar menu lateral" title="Abrir/Fechar menu">×</button>
 
-<div id="loader">
-  <h1>GEMINI</h1>
-  <p>Assistente de Tarefas</p>
-</div>
+  <nav id="menu" role="navigation" aria-label="Menu de funções">
+    <button type="button" title="Construtor">
+      <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
+    </button>
+    <button type="button" title="Saqueador">
+      <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
+    </button>
+    <button type="button" title="Recrutador">
+      <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
+    </button>
+  </nav>
 
-<!-- Conteúdo da sua página vai aqui -->
-<div id="app" style="display:none;">
-  <!-- Seu código principal aqui -->
-  <p>Conteúdo do app carregado.</p>
-</div>
-
-<script>
-  // Simula carregamento de 5 segundos
-  setTimeout(() => {
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  }, 5000);
-</script>
-
+  <script>
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const menu = document.getElementById('menu');
+    toggleBtn.addEventListener('click', () => {
+      menu.classList.toggle('collapsed');
+    });
+  </script>
 </body>
 </html>

@@ -3,20 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Assistente - Painel</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+<title>Menu com Modais Embutidos</title>
 <style>
-  html, body {
-    margin: 0; padding: 0; height: 100%;
+  body {
     font-family: 'Montserrat', sans-serif;
+    margin: 0; padding: 0;
+    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center/cover fixed;
     color: #eee;
     overflow: hidden;
-  }
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background: url('https://media.innogamescdn.com/TribalWars/wallpapers/desktop/TribalWarsWallpaper_1_1920x1200.jpg') no-repeat center/100% 100% fixed;
-    z-index: -2;
+    display: flex;
   }
   body::after {
     content: "";
@@ -25,21 +20,7 @@
     z-index: -1;
   }
 
-  #toggle-sidebar {
-    position: fixed; top: 10px; left: 10px;
-    width: 36px; height: 36px;
-    background: rgba(0,0,0,0.7);
-    border: none; border-radius: 6px;
-    color: #eee; font-size: 24px;
-    cursor: pointer; z-index: 10;
-    display: flex; justify-content: center; align-items: center;
-    user-select: none;
-    transition: background-color 0.3s;
-  }
-  #toggle-sidebar:hover {
-    background: rgba(0,0,0,0.9);
-  }
-
+  /* Menu lateral */
   #menu {
     position: fixed;
     top: 50%;
@@ -54,13 +35,12 @@
     gap: 14px;
     align-items: center;
     height: auto;
-    transition: width 0.3s ease, height 0.3s ease;
-    z-index: 5;
+    transition: width 0.3s ease;
+    z-index: 10;
   }
   #menu.collapsed {
     width: 40px;
   }
-
   #menu button {
     cursor: pointer;
     user-select: none;
@@ -70,9 +50,8 @@
     background: transparent;
     transition: background-color 0.2s ease;
     display: flex; justify-content: center; align-items: center;
-  }
-  #menu.collapsed button {
-    width: 32px; height: 32px;
+    color: #eee;
+    font-size: 0;
   }
   #menu button:hover,
   #menu button.active {
@@ -84,110 +63,178 @@
     user-select: none;
     transition: width 0.3s, height 0.3s;
   }
+  #menu.collapsed button {
+    width: 32px; height: 32px;
+  }
   #menu.collapsed button img {
     width: 24px; height: 24px;
   }
 
-  /* Container do painel carregado */
-  #painelContainer {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: rgba(0,0,0,0.8);
-    color: #eee;
-    overflow: auto;
-    padding: 20px;
-    box-sizing: border-box;
-    display: none;
-    z-index: 999;
+  /* Botão alternar menu */
+  #toggle-sidebar {
+    position: fixed; top: 10px; left: 10px;
+    width: 36px; height: 36px;
+    background: rgba(0,0,0,0.7);
+    border: none; border-radius: 6px;
+    color: #eee; font-size: 24px;
+    cursor: pointer; z-index: 20;
+    display: flex; justify-content: center; align-items: center;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  #toggle-sidebar:hover {
+    background: rgba(0,0,0,0.9);
   }
 
-  #painelContainer > button#fecharPainel {
+  /* Modal */
+  #modalOverlay {
     position: fixed;
-    top: 12px;
-    right: 12px;
-    background: #222;
-    border: none;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  #modalWindow {
+    background: #333;
+    border-radius: 12px;
+    max-width: 50vw;
+    max-height: 50vh;
+    padding: 15px 25px;
+    overflow-y: auto;
+    box-sizing: border-box;
+    box-shadow: 0 0 15px black;
+    position: relative;
     color: #eee;
-    font-size: 20px;
-    padding: 6px 12px;
-    border-radius: 8px;
+  }
+  #modalWindow h2 {
+    margin-top: 0;
+    font-size: 1.6em;
+  }
+  #modalWindow ul {
+    padding-left: 20px;
+    margin-top: 0;
+  }
+  #closeModal {
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 1.8em;
+    color: #eee;
     cursor: pointer;
   }
-
 </style>
 </head>
 <body>
-  <button id="toggle-sidebar" aria-label="Alternar menu lateral" title="Abrir/Fechar menu">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
-      <line x1="3" y1="6" x2="21" y2="6"/>
-      <line x1="3" y1="12" x2="21" y2="12"/>
-      <line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
+
+<button id="toggle-sidebar" aria-label="Alternar menu lateral" title="Abrir/Fechar menu">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#eee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <line x1="3" y1="12" x2="21" y2="12"/>
+    <line x1="3" y1="18" x2="21" y2="18"/>
+  </svg>
+</button>
+
+<nav id="menu" role="navigation" aria-label="Menu de funções">
+  <button id="btnConstrutor" type="button" title="Construtor" aria-haspopup="dialog" aria-controls="modalOverlay">
+    <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
   </button>
+  <button id="btnSaqueador" type="button" title="Saqueador" aria-haspopup="dialog" aria-controls="modalOverlay">
+    <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
+  </button>
+  <button id="btnRecrutador" type="button" title="Recrutador" aria-haspopup="dialog" aria-controls="modalOverlay">
+    <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
+  </button>
+</nav>
 
-  <nav id="menu" role="navigation" aria-label="Menu de funções">
-    <button type="button" title="Construtor" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuConstrutor.html">
-      <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
-    </button>
-    <button type="button" title="Saqueador" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuSaqueador.html">
-      <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
-    </button>
-    <button type="button" title="Recrutador" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuRecrutador.html">
-      <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
-    </button>
-  </nav>
-
-  <div id="painelContainer">
-    <button id="fecharPainel" title="Fechar painel">&times;</button>
-    <div id="conteudoPainel"></div>
+<!-- Modal -->
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+  <div id="modalWindow">
+    <button id="closeModal" aria-label="Fechar janela">&times;</button>
+    <div id="modalContent">
+      <!-- Conteúdo dinâmico aqui -->
+    </div>
   </div>
+</div>
 
-  <script>
-    const toggleBtn = document.getElementById('toggle-sidebar');
-    const menu = document.getElementById('menu');
-    const painelContainer = document.getElementById('painelContainer');
-    const conteudoPainel = document.getElementById('conteudoPainel');
-    const fecharPainelBtn = document.getElementById('fecharPainel');
-    const STORAGE_KEY = 'menu_collapsed_preference';
+<script>
+  const toggleBtn = document.getElementById('toggle-sidebar');
+  const menu = document.getElementById('menu');
+  const STORAGE_KEY = 'menu_collapsed_preference';
 
-    // Restaurar estado menu
-    const collapsedPref = localStorage.getItem(STORAGE_KEY);
-    if (collapsedPref === 'true') {
-      menu.classList.add('collapsed');
+  // Restaurar preferência de menu
+  if(localStorage.getItem(STORAGE_KEY) === 'true') {
+    menu.classList.add('collapsed');
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    menu.classList.toggle('collapsed');
+    localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
+  });
+
+  // Modais
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalContent = document.getElementById('modalContent');
+  const closeModalBtn = document.getElementById('closeModal');
+
+  // Conteúdos dos menus
+  const contents = {
+    construtor: `
+      <h2 id="modalTitle">Construtor</h2>
+      <p id="modalDesc">Ferramentas e funções para construir.</p>
+      <ul>
+        <li>Construir casas</li>
+        <li>Expandir fazenda</li>
+        <li>Melhorar muralha</li>
+      </ul>
+    `,
+    saqueador: `
+      <h2 id="modalTitle">Saqueador</h2>
+      <p id="modalDesc">Funções para organizar ataques e saques.</p>
+      <ul>
+        <li>Planejar ataque</li>
+        <li>Enviar tropas</li>
+        <li>Gerenciar saques</li>
+      </ul>
+    `,
+    recrutador: `
+      <h2 id="modalTitle">Recrutador</h2>
+      <p id="modalDesc">Gerencie o recrutamento de tropas.</p>
+      <ul>
+        <li>Treinar soldados</li>
+        <li>Gerenciar filas</li>
+        <li>Recrutar arqueiros</li>
+      </ul>
+    `
+  };
+
+  // Função para abrir modal com conteúdo específico
+  function openModal(key) {
+    modalContent.innerHTML = contents[key];
+    modalOverlay.style.display = 'flex';
+  }
+
+  // Botões menu
+  document.getElementById('btnConstrutor').addEventListener('click', () => openModal('construtor'));
+  document.getElementById('btnSaqueador').addEventListener('click', () => openModal('saqueador'));
+  document.getElementById('btnRecrutador').addEventListener('click', () => openModal('recrutador'));
+
+  // Fechar modal
+  closeModalBtn.addEventListener('click', () => {
+    modalOverlay.style.display = 'none';
+  });
+  modalOverlay.addEventListener('click', e => {
+    if(e.target === modalOverlay) modalOverlay.style.display = 'none';
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === "Escape" && modalOverlay.style.display === 'flex') {
+      modalOverlay.style.display = 'none';
     }
+  });
+</script>
 
-    toggleBtn.addEventListener('click', () => {
-      menu.classList.toggle('collapsed');
-      localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
-    });
-
-    // Abrir painel carregando o menu externo
-    menu.querySelectorAll('button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const urlMenu = btn.dataset.menu;
-        if (!urlMenu) return;
-
-        fetch(urlMenu)
-          .then(res => {
-            if (!res.ok) throw new Error('Erro ao carregar menu');
-            return res.text();
-          })
-          .then(html => {
-            conteudoPainel.innerHTML = html;
-            painelContainer.style.display = 'block';
-          })
-          .catch(err => {
-            conteudoPainel.innerHTML = `<p>Falha ao carregar conteúdo: ${err.message}</p>`;
-            painelContainer.style.display = 'block';
-          });
-      });
-    });
-
-    fecharPainelBtn.addEventListener('click', () => {
-      painelContainer.style.display = 'none';
-      conteudoPainel.innerHTML = '';
-    });
-  </script>
 </body>
 </html>

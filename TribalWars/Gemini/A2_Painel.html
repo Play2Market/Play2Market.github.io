@@ -87,6 +87,34 @@
   #menu.collapsed button img {
     width: 24px; height: 24px;
   }
+
+  /* Container do painel carregado */
+  #painelContainer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.8);
+    color: #eee;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none;
+    z-index: 999;
+  }
+
+  #painelContainer > button#fecharPainel {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    background: #222;
+    border: none;
+    color: #eee;
+    font-size: 20px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
 </style>
 </head>
 <body>
@@ -99,23 +127,31 @@
   </button>
 
   <nav id="menu" role="navigation" aria-label="Menu de funções">
-    <button type="button" title="Construtor">
+    <button type="button" title="Construtor" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuConstrutor.html">
       <img src="https://cdn-icons-png.flaticon.com/512/1946/1946433.png" alt="Construtor" />
     </button>
-    <button type="button" title="Saqueador">
+    <button type="button" title="Saqueador" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuSaqueador.html">
       <img src="https://cdn-icons-png.flaticon.com/512/5522/5522602.png" alt="Saqueador" />
     </button>
-    <button type="button" title="Recrutador">
+    <button type="button" title="Recrutador" data-menu="https://raw.githubusercontent.com/Play2Market/Play2Market.github.io/refs/heads/main/TribalWars/Gemini/A3_MenuRecrutador.html">
       <img src="https://cdn-icons-png.flaticon.com/512/2940/2940456.png" alt="Recrutador" />
     </button>
   </nav>
 
+  <div id="painelContainer">
+    <button id="fecharPainel" title="Fechar painel">&times;</button>
+    <div id="conteudoPainel"></div>
+  </div>
+
   <script>
     const toggleBtn = document.getElementById('toggle-sidebar');
     const menu = document.getElementById('menu');
+    const painelContainer = document.getElementById('painelContainer');
+    const conteudoPainel = document.getElementById('conteudoPainel');
+    const fecharPainelBtn = document.getElementById('fecharPainel');
     const STORAGE_KEY = 'menu_collapsed_preference';
 
-    // Recupera preferência salvo no localStorage
+    // Restaurar estado menu
     const collapsedPref = localStorage.getItem(STORAGE_KEY);
     if (collapsedPref === 'true') {
       menu.classList.add('collapsed');
@@ -123,8 +159,34 @@
 
     toggleBtn.addEventListener('click', () => {
       menu.classList.toggle('collapsed');
-      // Salva preferência atual
       localStorage.setItem(STORAGE_KEY, menu.classList.contains('collapsed'));
+    });
+
+    // Abrir painel carregando o menu externo
+    menu.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const urlMenu = btn.dataset.menu;
+        if (!urlMenu) return;
+
+        fetch(urlMenu)
+          .then(res => {
+            if (!res.ok) throw new Error('Erro ao carregar menu');
+            return res.text();
+          })
+          .then(html => {
+            conteudoPainel.innerHTML = html;
+            painelContainer.style.display = 'block';
+          })
+          .catch(err => {
+            conteudoPainel.innerHTML = `<p>Falha ao carregar conteúdo: ${err.message}</p>`;
+            painelContainer.style.display = 'block';
+          });
+      });
+    });
+
+    fecharPainelBtn.addEventListener('click', () => {
+      painelContainer.style.display = 'none';
+      conteudoPainel.innerHTML = '';
     });
   </script>
 </body>

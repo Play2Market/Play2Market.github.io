@@ -1,1 +1,94 @@
-document.getElementById("toggleSidebar").addEventListener("click",()=>{document.getElementById("sidebar").classList.toggle("hidden")});document.querySelectorAll("#sidebar ul li").forEach(li=>{li.addEventListener("click",()=>{const section=li.getAttribute("data-section");document.getElementById("content").innerHTML=`<h1>${li.textContent.trim()}</h1><p>Conteúdo da função ${section.toUpperCase()}</p>`})});
+document.addEventListener("DOMContentLoaded",()=>{
+  const toggleBtn=document.getElementById("toggle-sidebar"),
+    menu=document.getElementById("menu"),
+    buttons=menu.querySelectorAll("button[data-func]"),
+    funcPanel=document.getElementById("func-panel"),
+    funcTitle=document.getElementById("func-title"),
+    funcDesc=document.getElementById("func-desc"),
+    saveSwitch=document.getElementById("save-config-switch"),
+    enableSwitch=document.getElementById("enable-module-switch"),
+    consoleEl=document.getElementById("console"),
+    btnPadrao=document.getElementById("btn-padrao"),
+    btnRecursos=document.getElementById("btn-recursos"),
+    LS_SAVE_PREFIX="saveConfig_",
+    LS_ENABLE_PREFIX="enableModule_",
+    descriptions={
+      construcao:"Automatiza a construção e melhoria de edifícios.",
+      farm:"Gerencia ataques automáticos para coletar recursos.",
+      recrutamento:"Controla o recrutamento automático de tropas."
+    };
+  let currentFunc=null,
+    buttonsNamed={};
+  buttons.forEach(btn=>buttonsNamed[btn.dataset.func]=btn);
+  function timestamp(){
+    const d=new Date();
+    return `[${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}]`;
+  }
+  function log(msg){
+    const line=document.createElement("div");
+    line.textContent=`${timestamp()} ${msg}`;
+    consoleEl.appendChild(line);
+    consoleEl.scrollTop=consoleEl.scrollHeight;
+  }
+  function setActiveButton(selectedBtn){
+    [btnPadrao,btnRecursos].forEach(btn=>btn.classList.toggle("active",btn===selectedBtn));
+    log(`Modo selecionado: ${selectedBtn.textContent}`);
+  }
+  btnPadrao.addEventListener("click",()=>setActiveButton(btnPadrao));
+  btnRecursos.addEventListener("click",()=>setActiveButton(btnRecursos));
+  function updatePanel(func){
+    currentFunc=func;
+    const btn=buttonsNamed[func];
+    funcTitle.textContent=btn?.querySelector("img")?.alt||func.charAt(0).toUpperCase()+func.slice(1)+" Automático";
+    funcDesc.textContent=descriptions[func]||"";
+    saveSwitch.checked=localStorage.getItem(LS_SAVE_PREFIX+func)==="true";
+    enableSwitch.checked=localStorage.getItem(LS_ENABLE_PREFIX+func)==="true";
+    funcPanel.style.display="flex";
+    buttons.forEach(btn=>{
+      btn.classList.toggle("active",btn.dataset.func===func);
+      btn.setAttribute("aria-pressed",btn.dataset.func===func?"true":"false");
+    });
+    setActiveButton(btnPadrao);
+    log(`Painel aberto: ${funcTitle.textContent}`);
+    log(`Salvar Configuração: ${saveSwitch.checked}`);
+    log(`Habilitar Módulo: ${enableSwitch.checked}`);
+    funcPanel.focus();
+  }
+  buttons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      if(currentFunc===btn.dataset.func&&funcPanel.style.display==="flex"){
+        funcPanel.style.display="none";
+        log("Painel fechado");
+        currentFunc=null;
+        buttons.forEach(b=>{
+          b.classList.remove("active");
+          b.setAttribute("aria-pressed","false");
+        });
+        return;
+      }
+      updatePanel(btn.dataset.func);
+    });
+  });
+  saveSwitch.addEventListener("change",()=>{
+    if(!currentFunc) return;
+    localStorage.setItem(LS_SAVE_PREFIX+currentFunc,saveSwitch.checked);
+    log(`Salvar Configuração alterado para ${saveSwitch.checked} em ${currentFunc}`);
+  });
+  enableSwitch.addEventListener("change",()=>{
+    if(!currentFunc) return;
+    localStorage.setItem(LS_ENABLE_PREFIX+currentFunc,enableSwitch.checked);
+    log(`Habilitar Módulo alterado para ${enableSwitch.checked} em ${currentFunc}`);
+  });
+  document.body.addEventListener("click",e=>{
+    if(funcPanel.style.display==="flex"&&!funcPanel.contains(e.target)&&!e.target.closest("#menu")&&e.target!==toggleBtn){
+      funcPanel.style.display="none";
+      log("Painel fechado");
+      currentFunc=null;
+      buttons.forEach(btn=>{
+        btn.classList.remove("active");
+        btn.setAttribute("aria-pressed","false");
+      });
+    }
+  });
+  toggleBtn.addEventListener("click",()=>menu.classList.toggle("collapsed"));
+});

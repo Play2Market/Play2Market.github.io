@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     funcDesc=document.getElementById("func-desc"),
     saveSwitch=document.getElementById("save-config-switch"),
     enableSwitch=document.getElementById("enable-module-switch"),
-    consoleEl=document.getElementById("console"),
     btnPadrao=document.getElementById("btn-padrao"),
     btnRecursos=document.getElementById("btn-recursos"),
     LS_SAVE_PREFIX="saveConfig_",
@@ -20,19 +19,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   let currentFunc=null,
     buttonsNamed={};
   buttons.forEach(btn=>buttonsNamed[btn.dataset.func]=btn);
-  function timestamp(){
-    const d=new Date();
-    return `[${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}]`;
-  }
-  function log(msg){
-    const line=document.createElement("div");
-    line.textContent=`${timestamp()} ${msg}`;
-    consoleEl.appendChild(line);
-    consoleEl.scrollTop=consoleEl.scrollHeight;
-  }
   function setActiveButton(selectedBtn){
     [btnPadrao,btnRecursos].forEach(btn=>btn.classList.toggle("active",btn===selectedBtn));
-    log(`Modo selecionado: ${selectedBtn.textContent}`);
   }
   btnPadrao.addEventListener("click",()=>setActiveButton(btnPadrao));
   btnRecursos.addEventListener("click",()=>setActiveButton(btnRecursos));
@@ -49,16 +37,12 @@ document.addEventListener("DOMContentLoaded",()=>{
       btn.setAttribute("aria-pressed",btn.dataset.func===func?"true":"false");
     });
     setActiveButton(btnPadrao);
-    log(`Painel aberto: ${funcTitle.textContent}`);
-    log(`Salvar Configuração: ${saveSwitch.checked}`);
-    log(`Habilitar Módulo: ${enableSwitch.checked}`);
     funcPanel.focus();
   }
   buttons.forEach(btn=>{
     btn.addEventListener("click",()=>{
       if(currentFunc===btn.dataset.func&&funcPanel.style.display==="flex"){
         funcPanel.style.display="none";
-        log("Painel fechado");
         currentFunc=null;
         buttons.forEach(b=>{
           b.classList.remove("active");
@@ -72,17 +56,14 @@ document.addEventListener("DOMContentLoaded",()=>{
   saveSwitch.addEventListener("change",()=>{
     if(!currentFunc) return;
     localStorage.setItem(LS_SAVE_PREFIX+currentFunc,saveSwitch.checked);
-    log(`Salvar Configuração alterado para ${saveSwitch.checked} em ${currentFunc}`);
   });
   enableSwitch.addEventListener("change",()=>{
     if(!currentFunc) return;
     localStorage.setItem(LS_ENABLE_PREFIX+currentFunc,enableSwitch.checked);
-    log(`Habilitar Módulo alterado para ${enableSwitch.checked} em ${currentFunc}`);
   });
   document.body.addEventListener("click",e=>{
     if(funcPanel.style.display==="flex"&&!funcPanel.contains(e.target)&&!e.target.closest("#menu")&&e.target!==toggleBtn){
       funcPanel.style.display="none";
-      log("Painel fechado");
       currentFunc=null;
       buttons.forEach(btn=>{
         btn.classList.remove("active");

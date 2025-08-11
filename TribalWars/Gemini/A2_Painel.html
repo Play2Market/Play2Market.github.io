@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Loader GEMINI</title>
+<style>
+  /* Tela toda preta semi-transparente */
+  #loader {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Arial', sans-serif;
+    z-index: 9999;
+  }
+
+  #loader h1 {
+    font-size: 4rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+  }
+
+  #loader p {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 400;
+    opacity: 0.75;
+    margin-top: 0.5rem;
+  }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <h1>GEMINI</h1>
+  <p>Assistente de Tarefas</p>
+</div>
+
+<!-- Conteúdo da sua página vai aqui -->
+<div id="app" style="display:none;">
+  <!-- Seu código principal aqui -->
+  <p>Conteúdo do app carregado.</p>
+</div>
+
+<script>
+  // Simula carregamento de 5 segundos
+  setTimeout(() => {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }, 5000);
+</script>
+
+</body>
+</html>

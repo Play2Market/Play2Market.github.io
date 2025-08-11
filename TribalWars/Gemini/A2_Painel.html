@@ -10,7 +10,6 @@
     margin: 0; padding: 0; height: 100%;
     font-family: 'Montserrat', sans-serif;
     color: #eee;
-    display: flex;
     overflow: hidden;
   }
   body::before {
@@ -41,23 +40,24 @@
     background: rgba(0,0,0,0.9);
   }
 
-  /* Menu com fundo só atrás dos botões, sem margem/padding extras */
   #menu {
+    position: fixed;
+    top: 60px; /* posição abaixo do botão de toggle */
+    left: 10px;
+    width: 80px;
     background: rgba(0,0,0,0.6);
     border-radius: 16px;
-    padding: 8px 0;  /* pouco padding para envolver os botões */
+    padding: 8px 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
     align-items: center;
     height: auto;
-    width: 80px;
-    margin: 70px 0 10px 10px; /* posiciona menu conforme antes */
     transition: width 0.3s ease, height 0.3s ease;
+    z-index: 5;
   }
   #menu.collapsed {
     width: 40px;
-    margin-left: 10px;
   }
 
   #menu button {
